@@ -61,3 +61,19 @@ highlight ExtraWhitespace ctermbg=grey guibg=grey
 
 " Show tabs
 set list listchars=tab:»\ ,trail:·,extends:>,precedes:<
+
+" Persistent undo settings
+set undodir=~/.vim/undo
+set undofile
+set undolevels=1000 "maximum number of changes that can be undone
+set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+
+" Customised footline
+set statusline="%f%m%r%h%w [%Y] [0x%02.2B]%< %F%=%4v,%4l %3p%% of %L"
+
+" // to search for visually-highlighted text
+vnoremap // y/<C-R>"<CR>
+
+" Set scripts to be executable from the shell
+au BufWritePost * if getline(1) =~ "^#!" | if getline(1) =~ "/bin/" | silent !chmod +x <afile> | endif | endif
+
