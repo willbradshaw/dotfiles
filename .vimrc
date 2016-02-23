@@ -74,6 +74,5 @@ set statusline="%f%m%r%h%w [%Y] [0x%02.2B]%< %F%=%4v,%4l %3p%% of %L"
 " // to search for visually-highlighted text
 vnoremap // y/<C-R>"<CR>
 
-" Set scripts to be executable from the shell
+" Set saved scripts to be immediately executable from the shell
 au BufWritePost * if getline(1) =~ "^#!" | if getline(1) =~ "/bin/" | silent !chmod +x <afile> | endif | endif
-

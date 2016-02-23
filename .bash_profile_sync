@@ -1,0 +1,7 @@
+PATH=$PATH:/opt/IGVTools:/opt/bftools:/opt/quast:~/Documents/Code/scripts
+tmux attach -t working
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias libreoffice="libreoffice5.0"
+alias today="date +%Y-%m-%d"
