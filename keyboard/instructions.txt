@@ -1,0 +1,7 @@
+To alter a keyboard layout:
+1 - Modify appropriate layout specification in layout file
+2 - Save changes
+3 - Clear pre-compiled keymaps (sudo rm /var/lib/xkb/*.xkm)
+4 - Restart xwindows
+Keyboard layouts are by default in "/usr/share/X11/xkb".
+Symbol identifiers to use can be found in "/usr/include/X11/keysymdef.h".
