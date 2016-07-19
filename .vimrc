@@ -34,7 +34,7 @@ nnoremap <C-W><C-Left> <C-W><C-H>
 
 " Highlight text going over 80 characters
 highlight OverLength ctermbg=blue ctermfg=white guibg=#592929
-match OverLength /\%74v.\+/
+match OverLength /\%80v.\+/
 
 " Configure tab spacing
 filetype plugin indent on
