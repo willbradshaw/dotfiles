@@ -11,3 +11,5 @@ alias cp="cp -i" # Confirm before overwriting
 alias mv="mv -i"
 alias rm="rm -I" # Prompt before large/recursive deletions
 export EDITOR=vim
+# set gtk im module to default (to make synapse work)
+export GTK_IM_MODULE=" "
