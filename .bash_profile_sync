@@ -1,7 +1,4 @@
 tmux attach -t working
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
 alias libreoffice="libreoffice5.0"
 alias today="date +%Y-%m-%d"
 alias d="du -hs *"
