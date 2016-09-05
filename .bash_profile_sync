@@ -7,3 +7,7 @@ alias today="date +%Y-%m-%d"
 alias d="du -hs *"
 alias yesterday="date -d'yesterday' +%Y-%m-%d"
 alias tomorrow="date -d'tomorrow' +%Y-%m-%d"
+alias cp="cp -i" # Confirm before overwriting
+alias mv="mv -i"
+alias rm="rm -I" # Prompt before large/recursive deletions
+export EDITOR=vim
