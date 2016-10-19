@@ -87,6 +87,10 @@ alias gcm="git commit -m "
 alias gcam="git commit -am "
 alias gd="git diff"
 alias ga="git add --all "
+alias gps="git push"
+alias gpl="git pull"
+alias g="git"
+alias grv="git remote -v"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
