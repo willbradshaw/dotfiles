@@ -1,0 +1,20 @@
+clear control
+clear mod4
+clear Lock
+
+keycode 105 =
+keycode 206 =
+
+keycode 133 = Control_L NoSymbol Control_L
+keycode 134 = Control_R NoSymbol Control_R
+keycode 37 = Super_L NoSymbol Super_L
+keycode 66 = F13 F13 F13 F13 F13
+
+keycode 38 = a A a A adiaeresis Adiaeresis
+keycode 39 = o O o O odiaeresis Odiaeresis
+keycode 40 = e E e E eacute Eacute
+keycode 41 = u U u U udiaeresis Udiaeresis
+
+add control = Control_L
+add control = Control_R
+add mod4 = Super_L
