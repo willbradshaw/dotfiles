@@ -99,10 +99,12 @@ __git_pairing_prompt()
     fi
     #PREFIX="\[\e]0;\u@\h: \w\a\]\[\e[01;32m\]\342\234\223 \[\e[01;32m\]\u@\[\e[01;33m\]\h\[\e[00m\]:\[\e[01;34m\]\[\e[00m\]"
     PREFIX="\[\e[01;32m\]\u@\[\e[01;33m\]\h\[\e[00m\]:\[\e[01;34m\]\[\e[00m\]"
-    if [ -n "$s" ]; then
+    if [[ ! -d .git ]]; then
+      PS1="${PREFIX}\[${bold}\]\[${c_blue}\]\w\[${c_blue}\]\$ \[${c_clear}\]\[${normal}\]"
+    elif [[ -n "$s" ]]; then
       PS1="${PREFIX}\[${bold}\]\[${c_blue}\]\w \[${c_red}\]${b_prompt}\[${c_yellow}\]${p_prompt} \[${c_red}\]\$ \[${c_clear}\]\[${normal}\]"
     else
-      PS1="${PREFIX}\[${bold}\]\[${c_blue}\]\w\[${c_green}\]${b_prompt}\[${c_yellow}\]${p_prompt}\[${c_blue}\]\$ \[${c_clear}\]\[${normal}\]"
+      PS1="${PREFIX}\[${bold}\]\[${c_blue}\]\w \[${c_green}\]${b_prompt}\[${c_yellow}\]${p_prompt} \[${c_green}\]\$ \[${c_clear}\]\[${normal}\]"
     fi
     ;;
   esac
