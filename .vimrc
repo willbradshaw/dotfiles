@@ -76,3 +76,22 @@ vnoremap // y/<C-R>"<CR>
 
 " Set saved scripts to be immediately executable from the shell
 au BufWritePost * if getline(1) =~ "^#!" | if getline(1) =~ "/bin/" | silent execute "!chmod +x <afile>" | endif | endif
+
+" Move lines up and down with Ctrl-k/j
+nnoremap <C-j> :m .+1<CR>==
+nnoremap <C-k> :m .-2<CR>==
+inoremap <C-j> <Esc>:m .+1<CR>==gi
+inoremap <C-k> <Esc>:m .-2<CR>==gi
+vnoremap <C-j> :m '>+1<CR>gv=gv
+vnoremap <C-k> :m '<-2<CR>gv=gv
+
+" Make j and k work sensibly (i.e. on visual lines) 
+" Make gj and gk work how j and k did
+nnoremap k gk
+nnoremap j gj
+nnoremap gk k
+nnoremap gj j
+
+" Create new lines without entering insert mode
+nnoremap go o<Esc>
+nnoremap gO O<Esc>
