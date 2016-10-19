@@ -37,7 +37,6 @@ highlight OverLength ctermbg=blue ctermfg=white guibg=#592929
 match OverLength /\%80v.\+/
 
 " Configure tab spacing
-filetype plugin indent on
 set tabstop=4
 set shiftwidth=4
 set expandtab
