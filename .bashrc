@@ -103,8 +103,8 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     # set gtk im module to default (to make synapse work)
     export GTK_IM_MODULE=" "
-    export PATH=$PATH:~/Documents/code/scripts:~/Documents/code/bio-utils
-elif [[ "$HOSTNAME" == "cluster" ]]; then # MPI cluster
+    export PATH=$PATH:$HOME/Documents/code/scripts:$HOME/Documents/code/bio-utils
+elif [[ "$HOSTNAME" == "cluster" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]; then # MPI cluster
     # Enable sterm etc.
     source /software/Modules/modules.rc
     export GIT_SSL_NO_VERIFY=1
@@ -112,10 +112,10 @@ elif [[ "$HOSTNAME" == "cluster" ]]; then # MPI cluster
     module load slurm slurm_scripts primer3 Python BLAST Java FastQC jellyfish
     module load Bowtie2 SPAdes/3.6.1 quast sspace perlthreads SAMtools
     module load Trimmomatic
-    PATH="$PATH:~/scripts:~/scripts/primify_:~/scripts/bap_:~/scripts/bio-utils"
-    PATH="$PATH:~/programs/MaSuRCA-2.3.2-CentOS6/bin:$HOME/.Python/2.7/bin"
+    export SCRIPT_DIR="$HOME/scripts"
+    export PATH="$PATH:$SCRIPT_DIR:$SCRIPT_DIR/primify_:$SCRIPT_DIR/bap_:$SCRIPT_DIR/bio-utils"
+    export PATH="$PATH:$HOME/programs/MaSuRCA-2.3.2-CentOS6/bin:$HOME/.Python/2.7/bin"
     # Primer3 installation
-    export SCRIPT_DIR="/beegfs/group_dv/home/WBradshaw/scripts"
     export PRIMER3_THERMOPARAMS_DIR="/software/primer3/2.3.6/primer3_config/"
     export PRIMIFY_CONFIG_DIR="$SCRIPT_DIR/primify/config"
     # BAP installation
@@ -131,9 +131,9 @@ elif [[ "$HOSTNAME" == "cluster" ]]; then # MPI cluster
     function update-x11-forwarding
     {
         if [ -z "$STY" -a -z "$TMUX" ]; then
-            echo $DISPLAY > ~/.display.txt
+            echo $DISPLAY > $HOME/.display.txt
         else
-            export DISPLAY=`cat ~/.display.txt`
+            export DISPLAY=`cat $HOME/.display.txt`
         fi
     }
     # This is run before every command.
@@ -146,7 +146,6 @@ elif [[ "$HOSTNAME" == "cluster" ]]; then # MPI cluster
         #echo DISPLAY = $DISPLAY, display.txt = `cat ~/.display.txt`, STY = $STY, TMUX = $TMUX  
     }
     trap 'preexec' DEBUG;
-
 fi
 
 ##################
@@ -188,7 +187,7 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 source ~/.git-pairing-prompt.sh
 PROMPT_COMMAND=__git_pairing_prompt
 # After each command, save and reload history
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+#export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 ##########
 ## TMUX ##
