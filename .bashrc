@@ -77,6 +77,7 @@ alias la='ls -A'
 alias l='ls -CF'
 alias x="xmodmap ~/.Xmodmap"
 alias get="sudo apt install"
+alias rl="readlink -f"
 
 # Git commands
 alias gs="git status "
@@ -104,17 +105,25 @@ if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     # set gtk im module to default (to make synapse work)
     export GTK_IM_MODULE=" "
     export PATH=$PATH:$HOME/Documents/code/scripts:$HOME/Documents/code/bio-utils
-elif [[ "$HOSTNAME" == "cluster" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]; then # MPI cluster
+elif [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]; then # MPI cluster
     # Enable sterm etc.
     source /software/Modules/modules.rc
     export GIT_SSL_NO_VERIFY=1
     # Load standard bioinformatics tools
-    module load slurm slurm_scripts primer3 Python BLAST Java FastQC jellyfish
+    module load slurm
+    module load slurm_scripts primer3 Python BLAST Java/1.7.0_79 FastQC
     module load Bowtie2 SPAdes/3.6.1 quast sspace perlthreads SAMtools
     module load Trimmomatic
     export SCRIPT_DIR="$HOME/scripts"
     export PATH="$PATH:$SCRIPT_DIR:$SCRIPT_DIR/primify_:$SCRIPT_DIR/bap_:$SCRIPT_DIR/bio-utils"
     export PATH="$PATH:$HOME/programs/MaSuRCA-2.3.2-CentOS6/bin:$HOME/.Python/2.7/bin"
+    export PATH="$PATH:$HOME/programs/igblast/bin:$HOME/programs/bioawk"
+    export PATH="$PATH:$HOME/programs/jellyfish/bin"
+    export PATH="$PATH:$HOME/programs/fsa-1.15.9/bin"
+    export PATH="$PATH:$HOME/programs/swipe-2.0.5/bin"
+    export PYTHONPATH="$PYTHONPATH:$HOME/programs/jellyfish/lib/python2.7/site-packages" # For jellyfish package
+    # IGBLAST Internal Data
+    export IGDATA="$HOME/programs/igblast/"
     # Primer3 installation
     export PRIMER3_THERMOPARAMS_DIR="/software/primer3/2.3.6/primer3_config/"
     export PRIMIFY_CONFIG_DIR="$SCRIPT_DIR/primify/config"
@@ -146,6 +155,7 @@ elif [[ "$HOSTNAME" == "cluster" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster"
         #echo DISPLAY = $DISPLAY, display.txt = `cat ~/.display.txt`, STY = $STY, TMUX = $TMUX  
     }
     trap 'preexec' DEBUG;
+    source ~/perl5/perlbrew/etc/bashrc
 fi
 
 ##################
