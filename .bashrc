@@ -22,6 +22,17 @@ shopt -s histappend
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=1000
 HISTFILESIZE=2000
+## history logging
+
+HISTIGNORE="hnote*"
+# Used to put notes in a history file
+function hnote {
+    echo "## NOTE [`date`]: $*" >> $HOME/.history/bash_history-`date +%Y%m%d`
+}
+# used to keep my history forever
+PROMPT_COMMAND="[ -d $HOME/.history ] || mkdir -p $HOME/.history; echo : [\$(date)] $$ $HOSTNAME $USER \$OLDPWD\; \$(history 1 | sed -E 's/^[[:space:]]+[0-9]*[[:space:]]+//g') >> $HOME/.history/bash_history-\`date +%Y%m%d\`"
+
+
 
 ###############
 ## FUNCTIONS ##
@@ -77,6 +88,7 @@ alias la='ls -A'
 alias l='ls -CF'
 alias x="xmodmap ~/.Xmodmap"
 alias get="sudo apt install"
+alias rl="readlink -f"
 
 # Git commands
 alias gs="git status "
@@ -103,7 +115,29 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     # set gtk im module to default (to make synapse work)
     export GTK_IM_MODULE=" "
-    export PATH=$PATH:$HOME/Documents/code/scripts:$HOME/Documents/code/bio-utils
+    export SCRIPT_DIR="$HOME/Documents/code"
+    export TMPDIR="$HOME/tmp"
+    export PATH=$PATH:$SCRIPT_DIR/scripts
+    export PATH=$PATH:$SCRIPT_DIR/bio-utils
+    # Primify installation
+    export PATH=$PATH:$SCRIPT_DIR/primify
+    export PRIMIFY_CONFIG_DIR="$SCRIPT_DIR/primify/config"
+    export PRIMER3_THERMOPARAMS_DIR="$SCRIPT_DIR/primer3_config"
+    # CoMEv Installations
+    export PATH=$PATH:$HOME/Applications/bali-phy-3.0-beta1/bin
+    export PATH=$PATH:$HOME/Applications/consel/bin
+    export PATH=$PATH:$HOME/Applications/FigTree_v1.4.3/bin
+    export PATH=$PATH:$HOME/Applications/paml4.8/bin
+    export PATH=$PATH:$HOME/Applications/pamlX1.3.1-src/bin
+    export PATH=$PATH:$HOME/Applications/prank/bin
+    export PATH=$PATH:$HOME/Applications/seaview/bin
+    export PATH=$PATH:$HOME/Applications/Tracer_v1.6/bin
+    export PATH=$PATH:$HOME/Applications/trimal/bin
+    export PATH=$PATH:$HOME/Applications/beast1/bin
+    export PATH=$PATH:$HOME/Applications/beast2/bin
+    export PATH=$PATH:$HOME/Applications/bpp3.3a/bin
+    export PATH=$PATH:$HOME/Applications/SuiteMSA-1.3.22B/bin
+
 elif [[ "$HOSTNAME" == "cluster" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]; then # MPI cluster
     # Enable sterm etc.
     source /software/Modules/modules.rc
@@ -116,7 +150,6 @@ elif [[ "$HOSTNAME" == "cluster" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster"
     export PATH="$PATH:$SCRIPT_DIR:$SCRIPT_DIR/primify_:$SCRIPT_DIR/bap_:$SCRIPT_DIR/bio-utils"
     export PATH="$PATH:$HOME/programs/MaSuRCA-2.3.2-CentOS6/bin:$HOME/.Python/2.7/bin"
     # Primer3 installation
-    export PRIMER3_THERMOPARAMS_DIR="/software/primer3/2.3.6/primer3_config/"
     export PRIMIFY_CONFIG_DIR="$SCRIPT_DIR/primify/config"
     # BAP installation
     export SSPACE_PATH="/software/sspace/3.0/SSPACE_Standard_v3.0.pl"
