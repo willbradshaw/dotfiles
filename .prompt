@@ -115,10 +115,10 @@ fi
 
 __hist_log() {
     histpath="$HISTDIR/bash_history-$(date +%Y%m%d)"
-    history_prefix="[$(date +'%F/%Z-%T')] ${USER}@${HOSTNAME}:$OLDPWD $CONTAINER"
+    history_prefix="[$(date +'%F/%Z-%T')]\t${USER}@${HOSTNAME}:$OLDPWD$CONTAINER\t"
     history_suffix="$(history 1 | sed -E 's/^[[:space:]]+[0-9]*[[:space:]]+//g')"
     histstr="${history_prefix}${history_suffix}"
-    echo "${histstr}" >> ${histpath}
+    echo -e "${histstr}" >> ${histpath}
 }
 # After each command, save and reload history and log to history dir
 HIST_PROMPT="history -a; history -c; history -r; __hist_log"
