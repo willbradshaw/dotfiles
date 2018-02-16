@@ -191,7 +191,7 @@ if [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]
     
     if [[ -e /home/mpiage/.bashrc ]]; then  # Horrible hack to see if we're in a shifter image
         export SHIFTER="true"
-        export CONTAINER="(container) "
+        export CONTAINER="-(container)"
     else
         export SHIFTER="false"
         export CONTAINER=""
