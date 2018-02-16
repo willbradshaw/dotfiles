@@ -126,7 +126,8 @@ function extract()      # Handy Extract Program.
             *.tar)       tar xvf $1      ;;
             *.tbz2)      tar xvjf $1     ;;
             *.tgz)       tar xvzf $1     ;;
-            *.zip)       unzip $1        ;;
+            #*.zip)       unzip $1        ;;
+            *.zip)       7z x $1        ;;
             *.Z)         uncompress $1   ;;
             *.7z)        7z x $1         ;;
             *)           echo "'$1' cannot be extracted via >extract<" ;;
@@ -179,6 +180,7 @@ if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     export PATH=$PATH:$HOME/Applications/beast2/bin
     export PATH=$PATH:$HOME/Applications/bpp3.3a/bin
     export PATH=$PATH:$HOME/Applications/SuiteMSA-1.3.22B/bin
+    export PATH=$PATH:/opt/fwbackups/bin
 fi
 
 #############################
