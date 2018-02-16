@@ -1,68 +1,74 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-export EDITOR=vim
+################################
+## 1. CROSS-PLATFORM SETTINGS ##
+################################
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
       *) return;;
 esac
 
-#############
-## HISTORY ##
-#############
+#============
+# FORMATTING
+#============
 
-# don't put duplicate lines in the history. See bash(1) for more options
-# export HISTCONTROL=ignoredups
-export HISTCONTROL=ignoreboth:erasedups
-export HISTSIZE=
-export HISTFILESIZE=
-shopt -s histappend
+# Set character encodings
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+# Set default text editor
+export EDITOR=vim
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
+
+#Make less (man pages) be colourful
+export LESS_TERMCAP_mb=$(printf "\e[1;37m")
+export LESS_TERMCAP_md=$(printf "\e[1;37m")
+export LESS_TERMCAP_me=$(printf "\e[0m")
+export LESS_TERMCAP_se=$(printf "\e[0m")
+export LESS_TERMCAP_so=$(printf "\e[1;47;30m")
+export LESS_TERMCAP_ue=$(printf "\e[0m")
+export LESS_TERMCAP_us=$(printf "\e[0;36m")
+
+
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# colored GCC warnings and errors
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+#=========
+# HISTORY
+#=========
+
+# Configure history
 HISTSIZE=1000
 HISTFILESIZE=2000
-## history logging
-
+shopt -s histappend
 HISTIGNORE="hnote*"
+HISTDIR="${HOME}/.history"
+mkdir -p ${HISTDIR}
+
 # Used to put notes in a history file
 function hnote {
     echo "## NOTE [`date`]: $*" >> $HOME/.history/bash_history-`date +%Y%m%d`
 }
-# used to keep my history forever
-PROMPT_COMMAND="[ -d $HOME/.history ] || mkdir -p $HOME/.history; echo : [\$(date)] $$ $HOSTNAME $USER \$OLDPWD\; \$(history 1 | sed -E 's/^[[:space:]]+[0-9]*[[:space:]]+//g') >> $HOME/.history/bash_history-\`date +%Y%m%d\`"
 
+# see .prompt for history commands in PROMPT_COMMAND
 
-
-###############
-## FUNCTIONS ##
-###############
-
-function extract()      # Handy Extract Program.
-{
-    if [ -f $1 ] ; then
-        case $1 in
-            *.tar.bz2)   tar xvjf $1     ;;
-            *.tar.gz)    tar xvzf $1     ;;
-            *.bz2)       bunzip2 $1      ;;
-            *.rar)       unrar x $1      ;;
-            *.gz)        gunzip $1       ;;
-            *.tar)       tar xvf $1      ;;
-            *.tbz2)      tar xvjf $1     ;;
-            *.tgz)       tar xvzf $1     ;;
-            *.zip)       unzip $1        ;;
-            *.Z)         uncompress $1   ;;
-            *.7z)        7z x $1         ;;
-            *)           echo "'$1' cannot be extracted via >extract<" ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
-}
-
-#############
-## ALIASES ##
-#############
+#=========
+# ALIASES
+#=========
 
 # Automatic dates (for naming and finding files)
 alias today="date +%Y-%m-%d"
@@ -104,13 +110,49 @@ alias gpl="git pull"
 alias g="git"
 alias grv="git remote -v"
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+#==============
+# DECOMPRESSION
+#==============
 
-#############################
-## MACHINE-SPECIFIC CONFIG ##
-#############################
+function extract()      # Handy Extract Program.
+{
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xvjf $1     ;;
+            *.tar.gz)    tar xvzf $1     ;;
+            *.bz2)       bunzip2 $1      ;;
+            *.rar)       unrar x $1      ;;
+            *.gz)        gunzip $1       ;;
+            *.tar)       tar xvf $1      ;;
+            *.tbz2)      tar xvjf $1     ;;
+            *.tgz)       tar xvzf $1     ;;
+            *.zip)       unzip $1        ;;
+            *.Z)         uncompress $1   ;;
+            *.7z)        7z x $1         ;;
+            *)           echo "'$1' cannot be extracted via >extract<" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+#======
+# TMUX
+#======
+
+if [[ -n $(which tmux) ]]; then 
+    if $(tmux ls | grep -q working); then
+        tmux attach -t working
+    else
+        tmux new -s working
+    fi
+else
+    echo "Failed to load tmux: program unavailable."
+fi
+
+############################
+## 2. MPI LAPTOP SETTINGS ##
+############################
 
 if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     # set gtk im module to default (to make synapse work)
@@ -137,106 +179,118 @@ if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     export PATH=$PATH:$HOME/Applications/beast2/bin
     export PATH=$PATH:$HOME/Applications/bpp3.3a/bin
     export PATH=$PATH:$HOME/Applications/SuiteMSA-1.3.22B/bin
+fi
 
-elif [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]; then # MPI cluster
-    # Enable sterm etc.
-    source /software/Modules/modules.rc
+#############################
+## 3. MPI CLUSTER SETTINGS ##
+#############################
+
+if [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]; then # MPI cluster
+    
+    if [[ -e /home/mpiage/.bashrc ]]; then  # Horrible hack to see if we're in a shifter image
+        export SHIFTER="true"
+        export CONTAINER="(container) "
+    else
+        export SHIFTER="false"
+        export CONTAINER=""
+    fi
     export GIT_SSL_NO_VERIFY=1
-    # Load standard bioinformatics tools
-    module load slurm
-    module load slurm_scripts primer3 Python BLAST Java/1.7.0_79 FastQC
-    module load Bowtie2 SPAdes/3.6.1 quast sspace perlthreads SAMtools
-    module load Trimmomatic
+    export TMPDIR="/beegfs/common/tmp/$USER"
+
+    #==============
+    # MODULE SETUP
+    #==============
+
+    module() { eval `/usr/bin/modulecmd bash $*`; }
+    export -f module
+
+    MODULESHOME=/usr/share/Modules
+    export MODULESHOME
+
+    if [ "${LOADEDMODULES:-}" = "" ]; then
+        LOADEDMODULES=
+        export LOADEDMODULES
+    fi
+
+    if [ "${MODULEPATH:-}" = "" ]; then
+        MODULEPATH=`sed -n 's/[       #].*$//; /./H; $ { x; s/^\n//; s/\n/:/g; p; }' ${MODULESHOME}/init/.modulespath`
+        export MODULEPATH
+    fi
+
+    if [ ${BASH_VERSINFO:-0} -ge 3 ] && [ -r ${MODULESHOME}/init/bash_completion ]; then
+        . ${MODULESHOME}/init/bash_completion
+    fi
+
+    #=================
+    # LOADING MODULES
+    #=================
+
+    function ml() { # Try to load modules and report results
+    unset success failure errors
+        for mname in $@; do
+            errpath="${TMPDIR}/ml_${mname}"
+            module load ${mname} 2> ${errpath}
+            if [[ ! -s ${errpath} ]]; then 
+                success="${success} ${mname}"
+            else
+                failure="${failure} ${mname}"
+                errors="${errors}\n    $(cat ${errpath})"
+            fi
+        done
+        echo "Modules loaded successfully:${success}."
+        if [[ -n $failure ]]; then
+            >&2 echo "Modules failed to load:${failure}."
+            >&2 echo -e "Error messages:${errors}"
+        echo
+        fi
+    }
+ 
+    module purge
+    if [[ $SHIFTER == "false" ]]; then
+        source /beegfs/common/software/2017/age-bioinformatics.2017.only.rc # TODO: Update this
+        ml slurm shifter blast+
+    else
+        unset PYTHONHOME PYTHONUSERBASE PYTHONPATH
+        #export MODULEPATH=$MODF/general:$MODF/libs:$MODF/bioinformatics:/beegfs/common/software/containers/modules/modulefiles
+        ml python java perl fastqc blast bowtie primer3 spades quast trimmomatic samtools
+    fi
+    # shifter mpiage software containers logins
+
+    #================
+    # LOCAL PROGRAMS
+    #================
+
+    # Custom scripts
     export SCRIPT_DIR="$HOME/scripts"
     export PATH="$PATH:$SCRIPT_DIR:$SCRIPT_DIR/primify_:$SCRIPT_DIR/bap_:$SCRIPT_DIR/bio-utils"
-    export PATH="$PATH:$HOME/programs/MaSuRCA-2.3.2-CentOS6/bin:$HOME/.Python/2.7/bin"
-    export PATH="$PATH:$HOME/programs/igblast/bin:$HOME/programs/bioawk"
-    export PATH="$PATH:$HOME/programs/jellyfish/bin"
-    export PATH="$PATH:$HOME/programs/fsa-1.15.9/bin"
-    export PATH="$PATH:$HOME/programs/swipe-2.0.5/bin"
-    export PYTHONPATH="$PYTHONPATH:$HOME/programs/jellyfish/lib/python2.7/site-packages" # For jellyfish package
+
+    # User-installed programs
+    export PATH="$PATH:$HOME/applications/MaSuRCA-2.3.2-CentOS6/bin:$HOME/.Python/2.7/bin"
+    export PATH="$PATH:$HOME/applications/igblast/bin:$HOME/applications/bioawk"
+    export PATH="$PATH:$HOME/applications/jellyfish/bin"
+    export PATH="$PATH:$HOME/applications/fsa-1.15.9/bin"
+    export PATH="$PATH:$HOME/applications/swipe-2.0.5/bin"
+    export PYTHONPATH="$PYTHONPATH:$HOME/applications/jellyfish/lib/python2.7/site-packages" # For jellyfish package
+
     # IGBLAST Internal Data
-    export IGDATA="$HOME/programs/igblast/"
+    export IGDATA="$HOME/applications/igblast/"
+    
     # Primer3 installation
     export PRIMIFY_CONFIG_DIR="$SCRIPT_DIR/primify/config"
+    
     # BAP installation
     export SSPACE_PATH="/software/sspace/3.0/SSPACE_Standard_v3.0.pl"
     export GF_PATH="/software/gapfiller/1.10/GapFiller.pl"
     alias sspace="/software/sspace/3.0/SSPACE_Standard_v3.0.pl"
-    # Avoid filling default tmpdir
-    export TMPDIR="/beegfs/common/tmp/$USER"
-    # -- Improved X11 forwarding through GNU Screen (or tmux).
-    # If not in screen or tmux, update the DISPLAY cache.
-    # If we are, update the value of DISPLAY to be that in the cache.
-    # This section is black magic as far as I'm concerned tbh
-    function update-x11-forwarding
-    {
-        if [ -z "$STY" -a -z "$TMUX" ]; then
-            echo $DISPLAY > $HOME/.display.txt
-        else
-            export DISPLAY=`cat $HOME/.display.txt`
-        fi
-    }
-    # This is run before every command.
-    preexec() {
-        # Don't cause a preexec for PROMPT_COMMAND.
-        # Beware!  This fails if PROMPT_COMMAND is a string containing more than one command.
-        [ "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return 
-        update-x11-forwarding
-        # Debugging.
-        #echo DISPLAY = $DISPLAY, display.txt = `cat ~/.display.txt`, STY = $STY, TMUX = $TMUX  
-    }
-    trap 'preexec' DEBUG;
-    source ~/perl5/perlbrew/etc/bashrc
+
+    # get a fancy prompt
+    export PROMPT_COMMAND='DIR=`pwd|sed -e "s!$HOME!~!"`; if [ ${#DIR} -gt 30 ]; then CurDir=..${DIR:${#DIR}-28}; else CurDir=$DIR; fi'
+    export PS1="\[\033[01;32m\]\h\[\033[00m\]:\[\033[01;34m\]\$CurDir\$\[\033[00m\] "
+
 fi
 
-##################
-## OTHER CONFIG ##
-##################
+#######################
+## 4. COMMAND PROMPT ##
+#######################
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
-
-#Make less (man pages) be colourful
-export LESS_TERMCAP_mb=$(printf "\e[1;37m")
-export LESS_TERMCAP_md=$(printf "\e[1;37m")
-export LESS_TERMCAP_me=$(printf "\e[0m")
-export LESS_TERMCAP_se=$(printf "\e[0m")
-export LESS_TERMCAP_so=$(printf "\e[1;47;30m")
-export LESS_TERMCAP_ue=$(printf "\e[0m")
-export LESS_TERMCAP_us=$(printf "\e[0;36m")
-
-
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
-
-# colored GCC warnings and errors
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-####################
-## PROMPT COMMAND ##
-####################
-
-source ~/.git-pairing-prompt.sh
-PROMPT_COMMAND=__git_pairing_prompt
-# After each command, save and reload history
-#export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
-
-##########
-## TMUX ##
-##########
-
-if $(tmux ls | grep -q working); then
-    tmux attach -t working
-else
-    tmux new -s working
-fi
+source ${HOME}/.prompt

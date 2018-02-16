@@ -50,9 +50,9 @@ nnoremap k gk
 
 " vim clipboard is system clipboard!
 if has('unnamedplus')
-    set clipboard=unnamedplus
-  else
-    set clipboard=unnamed
+set clipboard=unnamedplus
+else
+set clipboard=unnamed
 endif
 
 " set trailing whitespace to grey not red

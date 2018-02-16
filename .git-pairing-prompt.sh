@@ -3,7 +3,7 @@
 
 __git_pairing_prompt()
 {
-    # Uncomment for profiling
+    # Uncomment the for profiling
     #PS4='+ $(date "+%s.%N")\011 '
     #exec 3>&2 2>/tmp/bashstart.$$.log
     #set -x
