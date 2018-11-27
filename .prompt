@@ -122,4 +122,4 @@ __hist_log() {
 # After each command, save and reload history and log to history dir
 HIST_PROMPT="history -a; history -c; history -r; __hist_log"
 
-export PROMPT_COMMAND="${HIST_PROMPT};__choose_prompt"
+export PROMPT_COMMAND="${HIST_PROMPT};${FORMAT_PROMPT}"
