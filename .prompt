@@ -99,7 +99,7 @@ __git_pairing_prompt()
 
 # First determine prompt format
 __choose_prompt(){
-    if [[ "$HOSTNAME" == "amalia" ]]; then
+    if [[ "$CLUSTER" == "true" ]]; then
         if [[ $IMAGE == "false" ]]; then
             __standard_prompt
         else

@@ -181,6 +181,8 @@ cluster="amalia"
 clusterx="amaliax"
 if [[ "$HOSTNAME" == $cluster || "$HOSTNAME" == $clusterx || "$SLURM_SUBMIT_HOST" == $cluster ]]; then # MPI cluster
     CLUSTER="true"
+elif [[ "$HOSTNAME" == "dv-node-01" || "$HOSTNAME" == "dv-node-02" ]]; then
+    CLUSTER="true"
 else
     CLUSTER="false"
 fi
@@ -261,10 +263,6 @@ if [[ "$CLUSTER" == "true" ]]; then
     export GF_PATH="/software/gapfiller/1.10/GapFiller.pl"
     alias sspace="/software/sspace/3.0/SSPACE_Standard_v3.0.pl"
 
-    # get a fancy prompt
-    export PROMPT_COMMAND='DIR=`pwd|sed -e "s!$HOME!~!"`; if [ ${#DIR} -gt 30 ]; then CurDir=..${DIR:${#DIR}-28}; else CurDir=$DIR; fi'
-    export PS1="\[\033[01;32m\]\h\[\033[00m\]:\[\033[01;34m\]\$CurDir\$\[\033[00m\] "
-
     #==============
     # MODULE SETUP
     #==============
@@ -339,4 +337,3 @@ fi
 #================
 
 source ${HOME}/.prompt
-
