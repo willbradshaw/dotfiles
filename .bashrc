@@ -179,6 +179,14 @@ if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     export PATH=$PATH:$HOME/Applications/beast2/bin
     export PATH=$PATH:$HOME/Applications/bpp3.3a/bin
     export PATH=$PATH:$HOME/Applications/SuiteMSA-1.3.22B/bin
+    export PATH="$PATH:$HOME/.linuxbrew/bin"
+    # added by Miniconda3 installer
+    export PATH="/home/will/miniconda3/bin:$PATH"
+    . /home/will/miniconda3/etc/profile.d/conda.sh
+    conda activate
+    # virtualenvwrapper config
+    export PROJECT_HOME=~/dev
+    export WORKON_HOME=~/dev/virtualenvs
 fi
 
 #############################
@@ -294,3 +302,4 @@ fi
 #######################
 
 source ${HOME}/.prompt
+

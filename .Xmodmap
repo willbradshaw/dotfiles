@@ -15,6 +15,7 @@ keycode 39 = o O o O odiaeresis Odiaeresis
 keycode 40 = e E e E eacute Eacute
 keycode 41 = u U u U udiaeresis Udiaeresis
 keycode 42 = i I i I idiaeresis Idiaeresis
+keycode 52 = semicolon colon semicolon colon backslash bar
 
 add control = Control_L
 add control = Control_R
