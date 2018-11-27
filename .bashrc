@@ -164,8 +164,8 @@ if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     export PATH=$PATH:/opt/fwbackups/bin
     export PATH="$PATH:$HOME/.linuxbrew/bin"
     # added by Miniconda3 installer
-    export PATH="/home/will/miniconda3/bin:$PATH"
-    . /home/will/miniconda3/etc/profile.d/conda.sh
+    export PATH="$HOME/miniconda3/bin:$PATH"
+    . ${HOME}/miniconda3/etc/profile.d/conda.sh
     conda activate
     # virtualenvwrapper config
     export PROJECT_HOME=~/dev
@@ -181,8 +181,10 @@ cluster="amalia"
 clusterx="amaliax"
 if [[ "$HOSTNAME" == $cluster || "$HOSTNAME" == $clusterx || "$SLURM_SUBMIT_HOST" == $cluster ]]; then # MPI cluster
     CLUSTER="true"
+    DVNODE="false"
 elif [[ "$HOSTNAME" == "dv-node-01" || "$HOSTNAME" == "dv-node-02" ]]; then
     CLUSTER="true"
+    DVNODE="true"
 else
     CLUSTER="false"
 fi
@@ -198,36 +200,16 @@ if [[ "$CLUSTER" == "true" ]]; then
         export CONTAINER=""
     fi
     export GIT_SSL_NO_VERIFY=1
-    export TMPDIR="/beegfs/common/tmp/$USER"
+    if [[ $DVNODE == "true" ]]; then
+        export TMPDIR="$HOME/.tmp"
+    else
+        export TMPDIR="/beegfs/common/tmp/$USER"
+    fi
     export PATH=$PATH:$HOME/bin
 
     function sterm(){
         srun -p blade,himem,hugemem,long -c $1 --pty bash
     }
-
-    #==============
-    # MODULE SETUP
-    #==============
-
-    module() { eval `/usr/bin/modulecmd bash $*`; }
-    export -f module
-
-    MODULESHOME=/usr/share/Modules
-    export MODULESHOME
-
-    if [ "${LOADEDMODULES:-}" = "" ]; then
-        LOADEDMODULES=
-        export LOADEDMODULES
-    fi
-
-    if [ "${MODULEPATH:-}" = "" ]; then
-        MODULEPATH=`sed -n 's/[       #].*$//; /./H; $ { x; s/^\n//; s/\n/:/g; p; }' ${MODULESHOME}/init/.modulespath`
-        export MODULEPATH
-    fi
-
-    if [ ${BASH_VERSINFO:-0} -ge 3 ] && [ -r ${MODULESHOME}/init/bash_completion ]; then
-        . ${MODULESHOME}/init/bash_completion
-    fi
 
     #================
     # LOCAL PROGRAMS
@@ -248,8 +230,8 @@ if [[ "$CLUSTER" == "true" ]]; then
     export PYTHONPATH="$PYTHONPATH:$HOME/applications/jellyfish/lib/python2.7/site-packages" # For jellyfish package
 
     # conda setup
-    export PATH="$PATH:/beegfs/group_dv/home/WBradshaw/miniconda3/bin"
-    . /beegfs/group_dv/home/WBradshaw/miniconda3/etc/profile.d/conda.sh
+    export PATH="$PATH:$HOME/miniconda3/bin"
+    . ${HOME}/miniconda3/etc/profile.d/conda.sh
     conda activate
 
     # IGBLAST Internal Data
@@ -266,32 +248,55 @@ if [[ "$CLUSTER" == "true" ]]; then
     #==============
     # MODULE SETUP
     #==============
-    if [[ $IMAGE == "false" ]]; then
-        source /beegfs/common/software/2017/age-bioinformatics.2017.only.rc # TODO: Update this
-    else
-        unset PYTHONHOME PYTHONUSERBASE PYTHONPATH
-        export MODULEPATH=$MODF/general:$MODF/libs:$MODF/bioinformatics:/beegfs/common/software/containers/modules/modulefiles
-    fi
+    if [[ $DVNODE == "false" ]]; then
 
-    function ml() { # Try to load modules and report results
-    unset success failure errors
-        for mname in $@; do
-            errpath="${TMPDIR}/ml_${mname/\//-}"
-            module load ${mname} 2> ${errpath}
-            if [[ ! -s ${errpath} ]]; then 
-                success="${success} ${mname}"
-            else
-                failure="${failure} ${mname}"
-                errors="${errors}\n    $(cat ${errpath})"
-            fi
-        done
-        echo "Modules loaded successfully:${success}."
-        if [[ -n $failure ]]; then
-            >&2 echo "Modules failed to load:${failure}."
-            >&2 echo -e "Error messages:${errors}"
-        echo
+        module() { eval `/usr/bin/modulecmd bash $*`; }
+        export -f module
+
+        MODULESHOME=/usr/share/Modules
+        export MODULESHOME
+
+        if [ "${LOADEDMODULES:-}" = "" ]; then
+            LOADEDMODULES=
+            export LOADEDMODULES
         fi
-    }
+
+        if [ "${MODULEPATH:-}" = "" ]; then
+            MODULEPATH=`sed -n 's/[       #].*$//; /./H; $ { x; s/^\n//; s/\n/:/g; p; }' ${MODULESHOME}/init/.modulespath`
+            export MODULEPATH
+        fi
+
+        if [ ${BASH_VERSINFO:-0} -ge 3 ] && [ -r ${MODULESHOME}/init/bash_completion ]; then
+            . ${MODULESHOME}/init/bash_completion
+        fi
+
+        if [[ $IMAGE == "false" ]]; then
+            source /beegfs/common/software/2017/age-bioinformatics.2017.only.rc # TODO: Update this
+        else
+            unset PYTHONHOME PYTHONUSERBASE PYTHONPATH
+            export MODULEPATH=$MODF/general:$MODF/libs:$MODF/bioinformatics:/beegfs/common/software/containers/modules/modulefiles
+        fi
+
+        function ml() { # Try to load modules and report results
+        unset success failure errors
+            for mname in $@; do
+                errpath="${TMPDIR}/ml_${mname/\//-}"
+                module load ${mname} 2> ${errpath}
+                if [[ ! -s ${errpath} ]]; then 
+                    success="${success} ${mname}"
+                else
+                    failure="${failure} ${mname}"
+                    errors="${errors}\n    $(cat ${errpath})"
+                fi
+            done
+            echo "Modules loaded successfully:${success}."
+            if [[ -n $failure ]]; then
+                >&2 echo "Modules failed to load:${failure}."
+                >&2 echo -e "Error messages:${errors}"
+            echo
+            fi
+        }
+    fi
 fi
 
 
@@ -325,7 +330,7 @@ fi
 # LOADING CLUSTER MODULES 
 #=========================
 
-if [[ "$CLUSTER" == "true" ]]; then
+if [[ "$CLUSTER" == "true" && $DVNODE == "false" ]]; then
     module purge
     if [[ $IMAGE == "false" ]]; then
         ml slurm blast+ shifter # /latest
