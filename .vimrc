@@ -24,6 +24,9 @@ set hidden
 " Remember last 1000 commands
 set history=1000
 
+" Highlight search matches by default
+set hls
+
 " Split config
 set splitbelow
 set splitright

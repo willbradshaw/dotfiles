@@ -2,12 +2,6 @@
 ## 1. CROSS-PLATFORM SETTINGS ##
 ################################
 
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
-
 #============
 # FORMATTING
 #============
@@ -46,6 +40,7 @@ fi
 
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
 
 #=========
 # HISTORY
@@ -95,6 +90,7 @@ alias l='ls -CF'
 alias x="xmodmap ~/.Xmodmap"
 alias get="sudo apt install"
 alias rl="readlink -f"
+alias cal="cal -m"
 
 # Git commands
 alias gs="git status "
@@ -126,7 +122,8 @@ function extract()      # Handy Extract Program.
             *.tar)       tar xvf $1      ;;
             *.tbz2)      tar xvjf $1     ;;
             *.tgz)       tar xvzf $1     ;;
-            *.zip)       unzip $1        ;;
+            #*.zip)       unzip $1        ;;
+            *.zip)       7z x $1        ;;
             *.Z)         uncompress $1   ;;
             *.7z)        7z x $1         ;;
             *)           echo "'$1' cannot be extracted via >extract<" ;;
@@ -136,24 +133,9 @@ function extract()      # Handy Extract Program.
     fi
 }
 
-#======
-# TMUX
-#======
-
-if [[ -n $(which tmux) ]]; then 
-    if $(tmux ls | grep -q working); then
-        tmux attach -t working
-    else
-        tmux new -s working
-    fi
-else
-    echo "Failed to load tmux: program unavailable."
-fi
-
 ############################
 ## 2. MPI LAPTOP SETTINGS ##
 ############################
-
 if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     # set gtk im module to default (to make synapse work)
     export GTK_IM_MODULE=" "
@@ -179,6 +161,7 @@ if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     export PATH=$PATH:$HOME/Applications/beast2/bin
     export PATH=$PATH:$HOME/Applications/bpp3.3a/bin
     export PATH=$PATH:$HOME/Applications/SuiteMSA-1.3.22B/bin
+    export PATH=$PATH:/opt/fwbackups/bin
     export PATH="$PATH:$HOME/.linuxbrew/bin"
     # added by Miniconda3 installer
     export PATH="/home/will/miniconda3/bin:$PATH"
@@ -189,21 +172,36 @@ if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
     export WORKON_HOME=~/dev/virtualenvs
 fi
 
-#############################
-## 3. MPI CLUSTER SETTINGS ##
-#############################
+##############################################
+## 3. MPI CLUSTER SETTINGS (NONINTERACTIVE) ##
+##############################################
 
-if [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]; then # MPI cluster
-    
-    if [[ -e /home/mpiage/.bashrc ]]; then  # Horrible hack to see if we're in a shifter image
-        export SHIFTER="true"
+# Test if in MPI age HPC cluster
+cluster="amalia"
+clusterx="amaliax"
+if [[ "$HOSTNAME" == $cluster || "$HOSTNAME" == $clusterx || "$SLURM_SUBMIT_HOST" == $cluster ]]; then # MPI cluster
+    CLUSTER="true"
+else
+    CLUSTER="false"
+fi
+
+if [[ "$CLUSTER" == "true" ]]; then
+    #echo $cluster
+    testfile="/etc/debian_version" #/home/mpiage/.bashrc
+    if [[ -e $testfile ]]; then  # Horrible hack to see if we're in a shifter image
+        export IMAGE="true"
         export CONTAINER="-(container)"
     else
-        export SHIFTER="false"
+        export IMAGE="false"
         export CONTAINER=""
     fi
     export GIT_SSL_NO_VERIFY=1
     export TMPDIR="/beegfs/common/tmp/$USER"
+    export PATH=$PATH:$HOME/bin
+
+    function sterm(){
+        srun -p blade,himem,hugemem,long -c $1 --pty bash
+    }
 
     #==============
     # MODULE SETUP
@@ -229,41 +227,6 @@ if [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]
         . ${MODULESHOME}/init/bash_completion
     fi
 
-    #=================
-    # LOADING MODULES
-    #=================
-
-    function ml() { # Try to load modules and report results
-    unset success failure errors
-        for mname in $@; do
-            errpath="${TMPDIR}/ml_${mname}"
-            module load ${mname} 2> ${errpath}
-            if [[ ! -s ${errpath} ]]; then 
-                success="${success} ${mname}"
-            else
-                failure="${failure} ${mname}"
-                errors="${errors}\n    $(cat ${errpath})"
-            fi
-        done
-        echo "Modules loaded successfully:${success}."
-        if [[ -n $failure ]]; then
-            >&2 echo "Modules failed to load:${failure}."
-            >&2 echo -e "Error messages:${errors}"
-        echo
-        fi
-    }
- 
-    module purge
-    if [[ $SHIFTER == "false" ]]; then
-        source /beegfs/common/software/2017/age-bioinformatics.2017.only.rc # TODO: Update this
-        ml slurm shifter blast+
-    else
-        unset PYTHONHOME PYTHONUSERBASE PYTHONPATH
-        #export MODULEPATH=$MODF/general:$MODF/libs:$MODF/bioinformatics:/beegfs/common/software/containers/modules/modulefiles
-        ml python java perl fastqc blast bowtie primer3 spades quast trimmomatic samtools
-    fi
-    # shifter mpiage software containers logins
-
     #================
     # LOCAL PROGRAMS
     #================
@@ -278,7 +241,14 @@ if [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]
     export PATH="$PATH:$HOME/applications/jellyfish/bin"
     export PATH="$PATH:$HOME/applications/fsa-1.15.9/bin"
     export PATH="$PATH:$HOME/applications/swipe-2.0.5/bin"
+    export PATH="$PATH:$HOME/.linuxbrew/bin"
+    export PATH="$PATH:$HOME/.local/bin"
     export PYTHONPATH="$PYTHONPATH:$HOME/applications/jellyfish/lib/python2.7/site-packages" # For jellyfish package
+
+    # conda setup
+    export PATH="$PATH:/beegfs/group_dv/home/WBradshaw/miniconda3/bin"
+    . /beegfs/group_dv/home/WBradshaw/miniconda3/etc/profile.d/conda.sh
+    conda activate
 
     # IGBLAST Internal Data
     export IGDATA="$HOME/applications/igblast/"
@@ -295,11 +265,78 @@ if [[ "$HOSTNAME" == "amalia" ]]; then # || "$SLURM_SUBMIT_HOST" == "cluster" ]]
     export PROMPT_COMMAND='DIR=`pwd|sed -e "s!$HOME!~!"`; if [ ${#DIR} -gt 30 ]; then CurDir=..${DIR:${#DIR}-28}; else CurDir=$DIR; fi'
     export PS1="\[\033[01;32m\]\h\[\033[00m\]:\[\033[01;34m\]\$CurDir\$\[\033[00m\] "
 
+    #==============
+    # MODULE SETUP
+    #==============
+    if [[ $IMAGE == "false" ]]; then
+        source /beegfs/common/software/2017/age-bioinformatics.2017.only.rc # TODO: Update this
+    else
+        unset PYTHONHOME PYTHONUSERBASE PYTHONPATH
+        export MODULEPATH=$MODF/general:$MODF/libs:$MODF/bioinformatics:/beegfs/common/software/containers/modules/modulefiles
+    fi
+
+    function ml() { # Try to load modules and report results
+    unset success failure errors
+        for mname in $@; do
+            errpath="${TMPDIR}/ml_${mname/\//-}"
+            module load ${mname} 2> ${errpath}
+            if [[ ! -s ${errpath} ]]; then 
+                success="${success} ${mname}"
+            else
+                failure="${failure} ${mname}"
+                errors="${errors}\n    $(cat ${errpath})"
+            fi
+        done
+        echo "Modules loaded successfully:${success}."
+        if [[ -n $failure ]]; then
+            >&2 echo "Modules failed to load:${failure}."
+            >&2 echo -e "Error messages:${errors}"
+        echo
+        fi
+    }
 fi
 
-#######################
-## 4. COMMAND PROMPT ##
-#######################
+
+#############################
+## 4. INTERACTIVE SETTINGS ##
+#############################
+
+# If not running interactively, don't do anything
+# WARNING: Removing this code block will break remote file transfer operations
+# if anything below it prints to stdout
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+#======
+# TMUX
+#======
+
+if [[ -n $(which tmux) ]]; then 
+    if $(tmux ls | grep -q working); then
+        tmux attach -t working
+    else
+        tmux new -s working
+    fi
+else
+    echo "Failed to load tmux: program unavailable."
+fi
+
+#=========================
+# LOADING CLUSTER MODULES 
+#=========================
+
+if [[ "$CLUSTER" == "true" ]]; then
+    module purge
+    if [[ $IMAGE == "false" ]]; then
+        ml slurm blast+ shifter # /latest
+    fi
+fi
+
+#================
+# COMMAND PROMPT
+#================
 
 source ${HOME}/.prompt
 
