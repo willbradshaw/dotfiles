@@ -100,7 +100,7 @@ __git_pairing_prompt()
 # First determine prompt format
 
 if [[ "$HOSTNAME" == "amalia" ]]; then
-    if [[ $SHIFTER == "false" ]]; then
+    if [[ $IMAGE == "false" ]]; then
         FORMAT_PROMPT=__standard_prompt
     else
         FORMAT_PROMPT=__shifter_prompt
