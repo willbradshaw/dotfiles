@@ -98,17 +98,19 @@ __git_pairing_prompt()
 ###########################
 
 # First determine prompt format
-if [[ "$HOSTNAME" == "amalia" ]]; then
-    if [[ $IMAGE == "false" ]]; then
-        FORMAT_PROMPT=__standard_prompt
+__choose_prompt(){
+    if [[ "$HOSTNAME" == "amalia" ]]; then
+        if [[ $IMAGE == "false" ]]; then
+            __standard_prompt
+        else
+            __shifter_prompt
+        fi
+    elif [[ ! -d .git ]]; then # Not in repo
+        __standard_prompt
     else
-        FORMAT_PROMPT=__shifter_prompt
+        __git_pairing_prompt
     fi
-elif [[ ! -d .git ]]; then # Not in repo
-    FORMAT_PROMPT=__standard_prompt
-else
-    FORMAT_PROMPT=__git_pairing_prompt
-fi
+}
 
 # Then set up history logging
 
