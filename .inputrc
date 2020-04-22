@@ -1,3 +1,5 @@
+$include /etc/inputrc
+
 # By default up/down are bound to previous-history
 # and next-history respectively. The following does the
 # same but gives the extra functionality where if you

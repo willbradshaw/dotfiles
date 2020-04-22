@@ -1,10 +1,12 @@
-################################
-## 1. CROSS-PLATFORM SETTINGS ##
-################################
+#############################
+## CROSS-PLATFORM SETTINGS ##
+#############################
 
 #============
 # FORMATTING
 #============
+
+# Activate readline settings
 
 # Set character encodings
 export LC_ALL=en_US.UTF-8
@@ -133,176 +135,43 @@ function extract()      # Handy Extract Program.
     fi
 }
 
-############################
-## 2. MPI LAPTOP SETTINGS ##
-############################
-if [[ "$HOSTNAME" == "wbradshaw-mpi" ]]; then # MPI laptop
-    # set gtk im module to default (to make synapse work)
-    export GTK_IM_MODULE=" "
-    export SCRIPT_DIR="$HOME/Documents/code"
-    export TMPDIR="$HOME/tmp"
-    export PATH=$PATH:$SCRIPT_DIR/scripts
-    export PATH=$PATH:$SCRIPT_DIR/bio-utils
-    # Primify installation
-    export PATH=$PATH:$SCRIPT_DIR/primify
-    export PRIMIFY_CONFIG_DIR="$SCRIPT_DIR/primify/config"
-    export PRIMER3_THERMOPARAMS_DIR="$SCRIPT_DIR/primer3_config"
-    # CoMEv Installations
-    export PATH=$PATH:$HOME/Applications/bali-phy-3.0-beta1/bin
-    export PATH=$PATH:$HOME/Applications/consel/bin
-    export PATH=$PATH:$HOME/Applications/FigTree_v1.4.3/bin
-    export PATH=$PATH:$HOME/Applications/paml4.8/bin
-    export PATH=$PATH:$HOME/Applications/pamlX1.3.1-src/bin
-    export PATH=$PATH:$HOME/Applications/prank/bin
-    export PATH=$PATH:$HOME/Applications/seaview/bin
-    export PATH=$PATH:$HOME/Applications/Tracer_v1.6/bin
-    export PATH=$PATH:$HOME/Applications/trimal/bin
-    export PATH=$PATH:$HOME/Applications/beast1/bin
-    export PATH=$PATH:$HOME/Applications/beast2/bin
-    export PATH=$PATH:$HOME/Applications/bpp3.3a/bin
-    export PATH=$PATH:$HOME/Applications/SuiteMSA-1.3.22B/bin
-    export PATH=$PATH:/opt/fwbackups/bin
-    export PATH="$PATH:$HOME/.linuxbrew/bin"
-    # added by Miniconda3 installer
-    export PATH="$HOME/miniconda3/bin:$PATH"
-    . ${HOME}/miniconda3/etc/profile.d/conda.sh
+#==============
+# COUNTDOWN
+#==============
+set bell-style visible
+function countdown(){
+    date1=$((`date +%s` + $1));
+    echo; echo;
+    while [ "$date1" -ge `date +%s` ]; do
+    echo -ne "$(date -u --date @$(($date1 - `date +%s`)) +%H:%M:%S)\r";
+    sleep 0.1
+    done
+    echo; echo; echo;
+    printf '\e[?5h'  # Turn on reverse video
+    sleep 0.1
+    printf '\e[?5l'  # Turn on normal video
+    }
+
+#####################
+## LAPTOP SETTINGS ##
+#####################
+
+if [[ "$HOSTNAME" == "apomorph" ]]; then # Dell XPS13
+    export TMPDIR="/tmp"
+    export PATH="$HOME/.miniconda/bin:$PATH"
+    . ${HOME}/.miniconda/etc/profile.d/conda.sh
     conda activate
     # virtualenvwrapper config
     export PROJECT_HOME=~/dev
     export WORKON_HOME=~/dev/virtualenvs
-fi
-
-##############################################
-## 3. MPI CLUSTER SETTINGS (NONINTERACTIVE) ##
-##############################################
-
-# Test if in MPI age HPC cluster
-cluster="amalia"
-clusterx="amaliax"
-if [[ "$HOSTNAME" == $cluster || "$HOSTNAME" == $clusterx || "$SLURM_SUBMIT_HOST" == $cluster ]]; then # MPI cluster
-    CLUSTER="true"
-    DVNODE="false"
-elif [[ "$HOSTNAME" == "dv-node-01" || "$HOSTNAME" == "dv-node-02" ]]; then
-    CLUSTER="true"
-    DVNODE="true"
-else
-    CLUSTER="false"
-fi
-
-if [[ "$CLUSTER" == "true" ]]; then
-    #echo $cluster
-    testfile="/etc/debian_version" #/home/mpiage/.bashrc
-    if [[ -e $testfile ]]; then  # Horrible hack to see if we're in a shifter image
-        export IMAGE="true"
-        export CONTAINER="-(container)"
-    else
-        export IMAGE="false"
-        export CONTAINER=""
-    fi
-    export GIT_SSL_NO_VERIFY=1
-    if [[ $DVNODE == "true" ]]; then
-        export TMPDIR="$HOME/.tmp"
-    else
-        export TMPDIR="/beegfs/common/tmp/$USER"
-    fi
-    export PATH=$PATH:$HOME/bin
-
-    function sterm(){
-        srun -p blade,himem,hugemem,long -c $1 --pty bash
-    }
-
-    #================
-    # LOCAL PROGRAMS
-    #================
-
-    # Custom scripts
-    export SCRIPT_DIR="$HOME/scripts"
-    export PATH="$PATH:$SCRIPT_DIR:$SCRIPT_DIR/primify_:$SCRIPT_DIR/bap_:$SCRIPT_DIR/bio-utils"
-
-    # User-installed programs
-    export PATH="$PATH:$HOME/applications/MaSuRCA-2.3.2-CentOS6/bin:$HOME/.Python/2.7/bin"
-    export PATH="$PATH:$HOME/applications/igblast/bin:$HOME/applications/bioawk"
-    export PATH="$PATH:$HOME/applications/jellyfish/bin"
-    export PATH="$PATH:$HOME/applications/fsa-1.15.9/bin"
-    export PATH="$PATH:$HOME/applications/swipe-2.0.5/bin"
-    export PATH="$PATH:$HOME/.linuxbrew/bin"
-    export PATH="$PATH:$HOME/.local/bin"
-    export PYTHONPATH="$PYTHONPATH:$HOME/applications/jellyfish/lib/python2.7/site-packages" # For jellyfish package
-
-    # conda setup
-    export PATH="$PATH:$HOME/miniconda3/bin"
-    . ${HOME}/miniconda3/etc/profile.d/conda.sh
-    conda activate
-
-    # IGBLAST Internal Data
-    export IGDATA="$HOME/applications/igblast/"
-    
-    # Primer3 installation
-    export PRIMIFY_CONFIG_DIR="$SCRIPT_DIR/primify/config"
-    
-    # BAP installation
-    export SSPACE_PATH="/software/sspace/3.0/SSPACE_Standard_v3.0.pl"
-    export GF_PATH="/software/gapfiller/1.10/GapFiller.pl"
-    alias sspace="/software/sspace/3.0/SSPACE_Standard_v3.0.pl"
-
-    #==============
-    # MODULE SETUP
-    #==============
-    if [[ $DVNODE == "false" ]]; then
-
-        module() { eval `/usr/bin/modulecmd bash $*`; }
-        export -f module
-
-        MODULESHOME=/usr/share/Modules
-        export MODULESHOME
-
-        if [ "${LOADEDMODULES:-}" = "" ]; then
-            LOADEDMODULES=
-            export LOADEDMODULES
-        fi
-
-        if [ "${MODULEPATH:-}" = "" ]; then
-            MODULEPATH=`sed -n 's/[       #].*$//; /./H; $ { x; s/^\n//; s/\n/:/g; p; }' ${MODULESHOME}/init/.modulespath`
-            export MODULEPATH
-        fi
-
-        if [ ${BASH_VERSINFO:-0} -ge 3 ] && [ -r ${MODULESHOME}/init/bash_completion ]; then
-            . ${MODULESHOME}/init/bash_completion
-        fi
-
-        if [[ $IMAGE == "false" ]]; then
-            source /beegfs/common/software/2017/age-bioinformatics.2017.only.rc # TODO: Update this
-        else
-            unset PYTHONHOME PYTHONUSERBASE PYTHONPATH
-            export MODULEPATH=$MODF/general:$MODF/libs:$MODF/bioinformatics:/beegfs/common/software/containers/modules/modulefiles
-        fi
-
-        function ml() { # Try to load modules and report results
-        unset success failure errors
-            for mname in $@; do
-                errpath="${TMPDIR}/ml_${mname/\//-}"
-                module load ${mname} 2> ${errpath}
-                if [[ ! -s ${errpath} ]]; then 
-                    success="${success} ${mname}"
-                else
-                    failure="${failure} ${mname}"
-                    errors="${errors}\n    $(cat ${errpath})"
-                fi
-            done
-            echo "Modules loaded successfully:${success}."
-            if [[ -n $failure ]]; then
-                >&2 echo "Modules failed to load:${failure}."
-                >&2 echo -e "Error messages:${errors}"
-            echo
-            fi
-        }
-    fi
+    # Compose key
+    export GTK_IM_MODULE="xim"
 fi
 
 
-#############################
-## 4. INTERACTIVE SETTINGS ##
-#############################
+##########################
+## INTERACTIVE SETTINGS ##
+##########################
 
 # If not running interactively, don't do anything
 # WARNING: Removing this code block will break remote file transfer operations
@@ -324,17 +193,6 @@ if [[ -n $(which tmux) ]]; then
     fi
 else
     echo "Failed to load tmux: program unavailable."
-fi
-
-#=========================
-# LOADING CLUSTER MODULES 
-#=========================
-
-if [[ "$CLUSTER" == "true" && $DVNODE == "false" ]]; then
-    module purge
-    if [[ $IMAGE == "false" ]]; then
-        ml slurm blast+ shifter # /latest
-    fi
 fi
 
 #================

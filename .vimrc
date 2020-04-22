@@ -65,7 +65,7 @@ highlight ExtraWhitespace ctermbg=grey guibg=grey
 set list listchars=tab:»\ ,trail:·,extends:>,precedes:<
 
 " Persistent undo settings
-set undodir=~/.vim/undo
+set undodir=~/.vim_undo
 set undofile
 set undolevels=1000 "maximum number of changes that can be undone
 set undoreload=10000 "maximum number lines to save for undo on a buffer reload
@@ -97,3 +97,6 @@ nnoremap gj j
 " Create new lines without entering insert mode
 nnoremap go o<Esc>
 nnoremap gO O<Esc>
+
+" Set colour scheme
+colorscheme elflord
