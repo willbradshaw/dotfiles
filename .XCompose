@@ -18,12 +18,12 @@ include "/usr/share/X11/locale/en_US.UTF-8/Compose"
 <Multi_key> <equal> <less> : "⇐" U21D0 # LEFTWARDS DOUBLE ARROW
 
 # Maths
-<Multi_key> <exclam> <equal>                : "≠"        U2260                # NOT EQUAL TO
 <Multi_key> <slash> <equal>                : "≠"        U2260                # NOT EQUAL TO
 <Multi_key> <less> <equal>                : "≤"        U2264                # LESS-THAN OR EQUAL TO
 <Multi_key> <greater> <equal> : "≥" U2265 # GREATER-THAN OR EQUAL TO
 <Multi_key> <equal> <equal> : "≡" U2261 # IDENTICAL TO
 <Multi_key> <equal> <bar> <equal> : "≢" U2262 # NOT IDENTICAL TO
+<Multi_key> <exclam> <equal> <equal> : "≢" U2262 # NOT IDENTICAL TO
 <Multi_key> <braceleft> <U>                : "∪"        U222A                # UNION
 <Multi_key> <braceleft> <N>        : "∩"        U2229                # INTERSECTION
 <Multi_key> <E> <E>                     : "∃"  U2203           # THERE EXISTS
@@ -31,6 +31,8 @@ include "/usr/share/X11/locale/en_US.UTF-8/Compose"
 <Multi_key> <A> <A> : "∀" U2200 # FOR ALL
 <Multi_key> <Multi_key> <Q> <E> <D> : "∎" U220E # END OF PROOF
 <Multi_key> <8> <8> : "∞" U221E # INFINITY
+<Multi_key> <asciitilde> <equal> : "≃" # Approx equal
+<Multi_key> <asciitilde> <asciitilde> : "≈" # Approx
 
 # subscripts
 <Multi_key> <underscore> <0>                 : "₀"  U2080             # SUBSCRIPT ZERO
@@ -73,6 +75,7 @@ include "/usr/share/X11/locale/en_US.UTF-8/Compose"
 
 # Greek!
 <Multi_key> <asterisk> <a>                : "α"        U03B1                # GREEK SMALL LETTER ALPHA
+<Multi_key> <period> <a>                : "α"        U03B1                # GREEK SMALL LETTER ALPHA
 <Multi_key> <asterisk> <b>                : "β"        U03B2                # GREEK SMALL LETTER BETA
 <Multi_key> <asterisk> <c>                : "ψ"        U03C8                # GREEK SMALL LETTER PSI
 <Multi_key> <asterisk> <d>                : "δ"        U03B4                # GREEK SMALL LETTER DELTA
@@ -131,3 +134,5 @@ include "/usr/share/X11/locale/en_US.UTF-8/Compose"
 <Multi_key> <b> <t>                            : "✔" # heavy tick
 <Multi_key> <B> <bar> : "₿" U20BF # BITCOIN SIGN
 <Multi_key> <t> <t> : "✓" # Regular tick
+<Multi_key> <t> <u> : "👍" # Thumbs-up emoji
+<Multi_key> <0> <0> : "°" # Degree sign
