@@ -100,3 +100,59 @@ nnoremap gO O<Esc>
 
 " Set colour scheme
 colorscheme elflord
+
+command! -nargs=* Wrap set wrap linebreak nolist
+command EndOfLine normal! $
+command! Date put =strftime('%Y-%m-%d %a %T (%Z)')
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'junegunn/goyo.vim'
+
+call plug#end()
+
+" Goyo Config
+" 120 is a subjective value that I like
+" let g:goyo_width = 120
+
+" Ensure :q to quit even when Goyo is active
+function! s:goyo_enter()
+    let b:quitting = 0
+    let b:quitting_bang = 0
+    autocmd QuitPre <buffer> let b:quitting = 1
+    cabbrev <buffer> q! let b:quitting_bang = 1 <bar> q!
+endfunction
+
+function! s:goyo_leave()
+    " Quit Vim if this is the only remaining buffer
+    if b:quitting && len(filter(range(1, bufnr(‘$’)), ‘buflisted(v:val)’)) == 1
+        if b:quitting_bang
+            qa!
+        else
+            qa
+        endif
+    endif
+endfunction
+
+let g:word_count="<unknown>"
+function WordCount()
+    return g:word_count
+endfunction
+function UpdateWordCount()
+    let lnum = 1
+    let n = 0
+    while lnum <= line('$')
+        let n = n + len(split(getline(lnum)))
+        let lnum = lnum + 1
+    endwhile
+    let g:word_count = n
+endfunction
+" Update the count when cursor is
+" idle in command or insert mode.
+" " Update when idle for 1000 msec
+" (default is 4000 msec).
+set updatetime=500
+augroup WordCounter
+    au! CursorHold,CursorHoldI *
+    call UpdateWordCount()
+augroup END
