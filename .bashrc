@@ -53,6 +53,7 @@ HISTSIZE=1000
 HISTFILESIZE=2000
 shopt -s histappend
 HISTIGNORE="hnote*"
+HISTIGNORE="$HISTIGNORE:jrnl *"
 HISTDIR="${HOME}/.history"
 mkdir -p ${HISTDIR}
 
@@ -93,20 +94,6 @@ alias x="xmodmap ~/.Xmodmap"
 alias get="sudo apt install"
 alias rl="readlink -f"
 alias cal="cal -m"
-
-# Git commands
-alias gs="git status "
-alias gc="git commit "
-alias gca="git commit -a "
-alias gcm="git commit -m "
-alias gcam="git commit -am "
-alias gd="git diff"
-alias ga="git add"
-alias gaa="git add --all"
-alias gps="git push"
-alias gpl="git pull"
-alias g="git"
-alias grv="git remote -v"
 
 #==============
 # DECOMPRESSION
@@ -159,6 +146,7 @@ function countdown(){
 if [[ "$HOSTNAME" == "apomorph" ]]; then # Dell XPS13
     export TMPDIR="/tmp"
     export PATH="$HOME/.miniconda/bin:$PATH"
+    export PATH="$HOME/bin:$PATH"
     . ${HOME}/.miniconda/etc/profile.d/conda.sh
     conda activate
     # virtualenvwrapper config
